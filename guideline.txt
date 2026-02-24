@@ -1,12 +1,18 @@
 1. Create ".env" file and include these following information:
     GEMINI_API_KEY=.... (Get one from Google AI Studio)
     GEMINI_MODEL=gemini-2.5-flash
+
 2. Create a python environment in the root folder with: python -m venv .venv
 (To leave this environment: type in "deactivate")
+
 3. In terminal: .venv\Scripts\activate
+
 4. In the same terminal: pip install -r requirements.txt
+
 5. In terminal: pip install -r requirements.txt
-6. Testing: python run_pipeline.py path/to/emr.pdf
+
+6. Testing: python run_pipeline.py "pdf_samples/file/of/your/choice"
+
         Add these (optional):
             --save: write the summary to data/snapshots.db
             --db path/to.db: custom DB path when using --save
