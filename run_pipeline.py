@@ -47,17 +47,23 @@ def main() -> None:
     if args.json:
         print(json.dumps(summary.model_dump(), indent=2))
     else:
-        print(f"Patient: {summary.patient_name}, Age: {summary.age}")
-        print(f"Conditions: {len(summary.conditions)}")
+        print(f"Patient:        {summary.patient_name}, Age: {summary.age}")
+        print(f"Discharge date: {summary.discharge_date}")
+        print()
+        print(f"Conditions ({len(summary.conditions)}):")
         for c in summary.conditions:
-            print(f"  - {c.name} ({c.status})")
-        print(f"Medications: {len(summary.medications)}")
+            print(f"  - {c.name} [{c.status}]")
+        print()
+        print(f"Medications ({len(summary.medications)}):")
         for m in summary.medications:
-            print(f"  - {m.name} {m.dose} {m.frequency}")
-        print(f"Follow-ups: {len(summary.follow_ups)}")
+            print(f"  - {m.name} | {m.dose} | {m.frequency} | Status: {m.status}")
+        print()
+        print(f"Follow-ups ({len(summary.follow_ups)}):")
         for f in summary.follow_ups:
-            print(f"  - {f.specialty}: {f.recommended_timeframe}")
-        print(f"Recent events: {len(summary.recent_events)}")
+            due = f"Due: {f.due_date}" if f.due_date != "N/A" else "Due: N/A"
+            print(f"  - {f.specialty}: {f.recommended_timeframe} | {due}")
+        print()
+        print(f"Recent events ({len(summary.recent_events)}):")
         for e in summary.recent_events:
             print(f"  - {e.type} ({e.date}): {e.reason}")
 

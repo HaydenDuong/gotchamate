@@ -11,6 +11,8 @@
 
 5. In terminal: pip install -r requirements.txt
 
+5.5. Run: python create_sample_pdfs.py to generate three simulated documents for testing
+
 6. Testing: python run_pipeline.py "pdf_samples/file/of/your/choice"
 
         Add these (optional):

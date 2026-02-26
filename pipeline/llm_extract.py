@@ -10,16 +10,44 @@ EXTRACTION_SCHEMA = """
 {
   "patient_name": "string",
   "age": integer (0-150),
-  "conditions": [{"name": "string", "status": "string (e.g. active/historical)", "notes": "string"}],
-  "medications": [{"name": "string", "dose": "string", "frequency": "string"}],
-  "follow_ups": [{"specialty": "string", "recommended_timeframe": "string"}],
-  "recent_events": [{"type": "string (e.g. admission)", "date": "string", "reason": "string"}]
+  "discharge_date": "string (e.g. 2024-06-05, or N/A if not found)",
+  "conditions": [
+    {"name": "string", "status": "string (active or historical)", "notes": "string or empty"}
+  ],
+  "medications": [
+    {
+      "name": "string",
+      "dose": "string or N/A",
+      "frequency": "string or N/A",
+      "status": "string — one of: New, Stopped, Dose Changed, Continuing, N/A. Use keywords: commenced/started=New, ceased/stopped/discontinued=Stopped, increased/reduced/changed=Dose Changed, continuing/unchanged=Continuing, otherwise N/A"
+    }
+  ],
+  "follow_ups": [
+    {
+      "specialty": "string (e.g. GP, Cardiology)",
+      "recommended_timeframe": "string (e.g. in 2 weeks) or N/A",
+      "due_date": "string — if discharge_date is known and timeframe is given, calculate the estimated due date (YYYY-MM-DD). Otherwise N/A"
+    }
+  ],
+  "recent_events": [
+    {"type": "string (e.g. admission, discharge)", "date": "string or N/A", "reason": "string or empty"}
+  ]
 }
 """
 
 SYSTEM_PROMPT = """You are a clinical document extraction engine.
 Extract structured data from the following discharge summary or clinical document.
-Return ONLY valid JSON matching this schema. Do not include markdown, code fences, or any explanation.
+Return ONLY valid JSON matching this schema exactly. Do not include markdown, code fences, or any explanation.
+
+Rules:
+- Use "N/A" (not null, not empty string) when a value is not present or cannot be determined.
+- For medication status, classify using these keywords if present:
+    commenced / started → New
+    ceased / stopped / discontinued → Stopped
+    increased / reduced / dose changed → Dose Changed
+    continuing / unchanged / no change → Continuing
+    if no keyword found → N/A
+- For follow_up due_date: if both discharge_date and a timeframe are available, calculate the estimated date (YYYY-MM-DD). Otherwise use N/A.
 
 Schema:
 """ + EXTRACTION_SCHEMA.strip()
