@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}{{ summary.patient_name }} — Clinical Snapshot{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="flex items-start justify-between mb-6 flex-wrap gap-4">
+  <div>
+    <a href="/dashboard" class="text-sm text-blue-600 hover:underline">&larr; Back to Dashboard</a>
+    <h1 class="text-2xl font-bold text-slate-800 mt-2">{{ summary.patient_name }}</h1>
+    <div class="flex flex-wrap gap-4 mt-1 text-sm text-slate-500">
+      <span>Age: <strong class="text-slate-700">{{ summary.age }}</strong></span>
+      <span>Discharge date: <strong class="text-slate-700">{{ summary.discharge_date }}</strong></span>
+    </div>
+  </div>
+  <span class="inline-block bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs font-medium px-3 py-1 rounded-full">
+    &#9888; AI-extracted &mdash; requires clinician verification
+  </span>
+</div>
+
+<!-- Stats row -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+  {% set stat_items = [
+    ("Conditions", summary.conditions | length, "bg-blue-50 text-blue-700"),
+    ("Medications", summary.medications | length, "bg-purple-50 text-purple-700"),
+    ("Follow-ups", summary.follow_ups | length, "bg-green-50 text-green-700"),
+    ("Events", summary.recent_events | length, "bg-orange-50 text-orange-700"),
+  ] %}
+  {% for label, count, cls in stat_items %}
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center">
+    <div class="text-2xl font-bold {{ cls.split()[1] }}">{{ count }}</div>
+    <div class="text-xs text-slate-500 mt-1">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Conditions -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-4">&#127912; Active Conditions</h2>
+  {% if summary.conditions %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead>
+        <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase tracking-wide">
+          <th class="pb-2 pr-6">Condition</th>
+          <th class="pb-2 pr-6">Status</th>
+          <th class="pb-2">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in summary.conditions %}
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-6 font-medium text-slate-800">{{ c.name }}</td>
+          <td class="py-2 pr-6">
+            {% if c.status == "active" %}
+              <span class="bg-red-50 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">Active</span>
+            {% else %}
+              <span class="bg-slate-100 text-slate-500 text-xs font-medium px-2 py-0.5 rounded-full">{{ c.status | capitalize }}</span>
+            {% endif %}
+          </td>
+          <td class="py-2 text-slate-500">{{ c.notes or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-slate-400 text-sm">No conditions extracted.</p>
+  {% endif %}
+</div>
+
+<!-- Medications -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-4">&#128138; Medications
+    {% if summary.medications | length > 5 %}
+    <span class="ml-2 bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+      &#9888; Polypharmacy ({{ summary.medications | length }} meds)
+    </span>
+    {% endif %}
+  </h2>
+  {% if summary.medications %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead>
+        <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase tracking-wide">
+          <th class="pb-2 pr-4">Medication</th>
+          <th class="pb-2 pr-4">Dose</th>
+          <th class="pb-2 pr-4">Frequency</th>
+          <th class="pb-2">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in summary.medications %}
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4 font-medium text-slate-800">{{ m.name }}</td>
+          <td class="py-2 pr-4 text-slate-600">{{ m.dose }}</td>
+          <td class="py-2 pr-4 text-slate-600">{{ m.frequency }}</td>
+          <td class="py-2">
+            {% if m.status == "New" %}
+              <span class="bg-green-50 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">&#43; New</span>
+            {% elif m.status == "Stopped" %}
+              <span class="bg-red-50 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full">&#10005; Stopped</span>
+            {% elif m.status == "Dose Changed" %}
+              <span class="bg-orange-50 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">&#8593; Dose Changed</span>
+            {% elif m.status == "Continuing" %}
+              <span class="bg-slate-100 text-slate-500 text-xs font-medium px-2 py-0.5 rounded-full">Continuing</span>
+            {% else %}
+              <span class="bg-slate-50 text-slate-400 text-xs px-2 py-0.5 rounded-full">N/A</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-slate-400 text-sm">No medications extracted.</p>
+  {% endif %}
+</div>
+
+<!-- Follow-ups -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-4">&#128197; Follow-up Plan</h2>
+  {% if summary.follow_ups %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead>
+        <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase tracking-wide">
+          <th class="pb-2 pr-6">Specialty</th>
+          <th class="pb-2 pr-6">Timeframe</th>
+          <th class="pb-2">Estimated Due Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in summary.follow_ups %}
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-6 font-medium text-slate-800">{{ f.specialty }}</td>
+          <td class="py-2 pr-6 text-slate-600">{{ f.recommended_timeframe }}</td>
+          <td class="py-2">
+            {% if f.due_date and f.due_date != "N/A" %}
+              <span class="bg-green-50 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">{{ f.due_date }}</span>
+            {% else %}
+              <span class="text-slate-400 text-xs">N/A</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-slate-400 text-sm">No follow-up instructions extracted.</p>
+  {% endif %}
+</div>
+
+<!-- Recent Events -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+  <h2 class="text-base font-semibold text-slate-700 mb-4">&#128203; Recent Events</h2>
+  {% if summary.recent_events %}
+  <div class="space-y-2">
+    {% for e in summary.recent_events %}
+    <div class="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0">
+      <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full capitalize whitespace-nowrap mt-0.5">{{ e.type }}</span>
+      <div>
+        <span class="text-slate-600 text-sm">{{ e.reason or "—" }}</span>
+        {% if e.date and e.date != "N/A" %}
+        <span class="text-slate-400 text-xs ml-2">{{ e.date }}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-slate-400 text-sm">No events extracted.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

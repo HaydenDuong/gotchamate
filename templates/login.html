@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — Discharge Intelligence{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-lg border border-slate-200 w-full max-w-md p-8">
+
+    <div class="text-center mb-8">
+      <div class="text-4xl mb-2">&#9889;</div>
+      <h1 class="text-2xl font-bold text-slate-800">Discharge Intelligence</h1>
+      <p class="text-slate-500 text-sm mt-1">Clinical Document Structuring Engine</p>
+    </div>
+
+    {% if error %}
+    <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-5">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/login" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+        <input
+          type="text"
+          name="username"
+          required
+          autofocus
+          class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="demo"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <input
+          type="password"
+          name="password"
+          required
+          class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="••••••••"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-sm transition"
+      >
+        Sign In
+      </button>
+    </form>
+
+    <p class="text-center text-xs text-slate-400 mt-6">
+      Demo credentials: <code class="bg-slate-100 px-1 rounded">demo / demo123</code>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

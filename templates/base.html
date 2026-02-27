@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Discharge Intelligence Engine{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  {% if request.session.get("logged_in") %}
+  <nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="text-blue-600 font-bold text-lg tracking-tight">&#9889; Discharge Intelligence</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="/dashboard" class="text-slate-600 hover:text-blue-600 text-sm font-medium">Dashboard</a>
+      <a href="/logout" class="text-sm text-red-500 hover:text-red-700 font-medium">Sign out</a>
+    </div>
+  </nav>
+  {% endif %}
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center text-xs text-slate-400 py-6">
+    AI-extracted structured summary &mdash; requires clinician verification.
+  </footer>
+
+</body>
+</html>

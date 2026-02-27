@@ -11,11 +11,19 @@
 
 5. In terminal: pip install -r requirements.txt
 
-5.5. Run: python create_sample_pdfs.py to generate three simulated documents for testing
-
 6. Testing: python run_pipeline.py "pdf_samples/file/of/your/choice"
 
         Add these (optional):
             --save: write the summary to data/snapshots.db
             --db path/to.db: custom DB path when using --save
             --json: print the summary as JSON
+
+# to test webapp:
+1. pip install -r requirements.txt
+
+2. Run: python create_sample_pdfs.py to generate three simulated documents for testing
+
+3. uvicorn app.main:app --reload
+
+4. username: demo
+   password: demo123
